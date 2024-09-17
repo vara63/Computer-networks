@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdbool.h>
+
+#define TOTAL_FRAMES 10
+#define WINDOW_SIZE 4
+
+int main() {
+    int frames[TOTAL_FRAMES];
+    int ack[TOTAL_FRAMES];
+    int send = 0;
+    int next_frame = 0;
+    int ack_count = 0;
+    int i;
+
+    for (i = 0; i < TOTAL_FRAMES; i++) {
+        frames[i] = i;
+        ack[i] = 0;
+    }
+
+    printf("Starting Sliding Window Protocol...\n");
+
+    while (ack_count < TOTAL_FRAMES) {
+        while (next_frame < TOTAL_FRAMES && next_frame < send + WINDOW_SIZE) {
+            printf("Sending frame %d\n", frames[next_frame]);
+            next_frame++;
+        }
+
+        for (i = send; i < next_frame; i++) {
+            if (ack[i] == 0) {
+                printf("Acknowledgment received for frame %d\n", frames[i]);
+                ack[i] = 1;
+                ack_count++;
+            }
+        }
+
+        while (send < TOTAL_FRAMES && ack[send] == 1) {
+            send++;
+        }
+
+        sleep(1);
+    }
+
+    printf("All frames sent and acknowledged.\n");
+    return 0;
+}
+
+output:
+Starting Sliding Window Protocol...
+Sending frame 0
+Sending frame 1
+Sending frame 2
+Sending frame 3
+Acknowledgment received for frame 0
+Acknowledgment received for frame 1
+Acknowledgment received for frame 2
+Acknowledgment received for frame 3
+Sending frame 4
+Sending frame 5
+Sending frame 6
+Sending frame 7
+Acknowledgment received for frame 4
+Acknowledgment received for frame 5
+Acknowledgment received for frame 6
+Acknowledgment received for frame 7
+Sending frame 8
+Sending frame 9
+Acknowledgment received for frame 8
+Acknowledgment received for frame 9
+All frames sent and acknowledged.
